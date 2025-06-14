@@ -44,7 +44,10 @@ while True:
     elif option_unlogged == 'c':
         client_name = input("Digite seu Nome: ").strip()
         client_cpf = input("Digite seu CPF: ").strip()
-        bank.create_checking_account(client_name, client_cpf)
+        client_date_of_birth = input("Digite sua data de nascimento: ").strip()
+        client_address = input("Digite seu endereço: ").strip()
+        if not bank.create_checking_account(client_name, client_cpf, client_date_of_birth, client_address):
+            continue
         print("Conta criada com sucesso!")
     else:
         print("Operação inválida, tente as opções disponíveis por favor!")

@@ -1,7 +1,7 @@
 from datetime import datetime
 import time
 from Client import Client
-from Utils import clear_cmd_line, round_decimal
+from Utils import clear_cmd_line, format_cpf, round_decimal
 from decimal import ROUND_HALF_UP, Decimal
 
 LIMIT_PER_WITHDRAWLS = Decimal('500.00')
@@ -170,8 +170,8 @@ class Account:
         account_of_receipt.add_balance(value)
         time.sleep(PROCESSING_WAITING_TIME_IN_SECONDS)
         clear_cmd_line(len(operation_info))
-        self.add_statement(f"Você transferiu um valor de R$ {round_decimal(value, DEFAULT_DECIMAL_PLACES)} para o cliente {account_of_receipt.get_client().get_name()} (CPF: {account_of_receipt.get_client().get_cpf()})")
-        account_of_receipt.add_statement(f"Você recebeu um valor de R$ {round_decimal(value, DEFAULT_DECIMAL_PLACES)} do cliente {self.client.get_name()} (CPF: {self.client.get_cpf()})")
+        self.add_statement(f"Você transferiu um valor de R$ {round_decimal(value, DEFAULT_DECIMAL_PLACES)} para o cliente {account_of_receipt.get_client().get_name()} (CPF: {format_cpf(account_of_receipt.get_client().get_cpf())})")
+        account_of_receipt.add_statement(f"Você recebeu um valor de R$ {round_decimal(value, DEFAULT_DECIMAL_PLACES)} do cliente {self.client.get_name()} (CPF: {format_cpf(self.client.get_cpf())})")
         print(f"O seu saldo atual é de: R$ {round_decimal(self.get_balance(), DEFAULT_DECIMAL_PLACES)}")
         return True
 

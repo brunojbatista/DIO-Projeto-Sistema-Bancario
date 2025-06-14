@@ -23,8 +23,18 @@ def is_valid_cpf(cpf: str) -> bool:
     Returns:
         bool: True se o CPF estiver no formato correto, False caso contrário.
     """
-    return re.search(r"^\s*\d{3}\.\d{3}\.\d{3}\-\d{2}\s*$", cpf) is not None
+    return re.search(r"^\s*\d{3}\.\d{3}\.\d{3}\-\d{2}\s*$", cpf) is not None or \
+        re.search(r"^\s*\d{11}\s*$", cpf) is not None
 
+def clear_cpf(cpf: str):
+    return re.sub(r"(\.|\-)", "", cpf)
+
+def format_cpf(cpf: str) -> str:
+    str_formatted = clear_cpf(cpf)
+    remain_caracteres = 11 - len(str_formatted)
+    if remain_caracteres > 0:
+        str_formatted = ("0" * remain_caracteres) + str_formatted
+    return f"{str_formatted[0:3]}.{str_formatted[3:6]}.{str_formatted[6:9]}\-{str_formatted[9:11]}"
 
 def round_decimal(value: Decimal, decimal_places: int) -> Decimal:
     """

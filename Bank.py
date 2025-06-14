@@ -1,12 +1,12 @@
 from datetime import datetime
 from decimal import Decimal
 import time
-from typing import List
+from typing import Dict, List
 
 from Account import Account
 from CheckingAccount import CheckingAccount
 from Client import Client
-from Utils import clear_cmd_line, is_valid_cpf
+from Utils import clear_cmd_line, clear_cpf, is_valid_cpf
 
 PROCESSING_WAITING_TIME_IN_SECONDS = 2
 
@@ -21,7 +21,7 @@ class Bank:
         """
         Inicializa o banco com lista vazia de contas e nenhum cliente conectado.
         """
-        self.accounts: List[(Client, Account)] = []
+        self.accounts: Dict[Account] = {}
         self.client: Client = None
         self.account: Account = None
 
@@ -60,6 +60,9 @@ class Bank:
             Account: Conta associada ao cliente ativo.
         """
         return self.account
+    
+    def get_accounts(self, ) -> Dict:
+        return self.accounts
 
     def add_account(self, client: Client, account: Account):
         """
@@ -69,9 +72,10 @@ class Bank:
             client (Client): Cliente associado à conta.
             account (Account): Conta a ser adicionada.
         """
-        self.accounts.append((client, account))
+        cpf = client.get_cpf()
+        self.accounts[cpf] = account
 
-    def create_account(self, client_name: str, client_cpf: str, account: Account):
+    def create_account(self, client_name: str, client_cpf: str, date_of_birth: str, address: str, account: Account) -> bool:
         """
         Cria uma nova conta associada a um cliente.
 
@@ -80,19 +84,26 @@ class Bank:
             client_cpf (str): CPF do cliente.
             account (Account): Instância da conta a ser criada.
         """
-        client = Client(client_cpf, client_name)
+        has_account = self.get_accounts().get(client_cpf, None) != None
+        if has_account:
+            print("Já existe um usuário cadastrado neste CPF")
+            return False
+        client = Client(client_cpf, client_name, date_of_birth, address)
         account.set_client(client)
         self.add_account(client, account)
+        return True
 
-    def create_checking_account(self, client_name: str, client_cpf: str):
+    def create_checking_account(self, client_name: str, client_cpf: str, date_of_birth: str, address: str) -> bool:
         """
         Cria uma nova conta corrente associada a um cliente.
 
         Args:
             client_name (str): Nome do cliente.
             client_cpf (str): CPF do cliente.
+            date_of_birth (str): Data de nascimento do cliente.
+            address (str): Endereço do cliente.
         """
-        self.create_account(client_name, client_cpf, CheckingAccount())
+        return self.create_account(client_name, client_cpf, date_of_birth, address, CheckingAccount())
 
     def sing_in_account(self, client_cpf: str) -> bool:
         """
@@ -104,13 +115,12 @@ class Bank:
         Returns:
             bool: True se o login foi bem-sucedido, False caso contrário.
         """
-        for client, account in self.accounts:
-            if client.get_cpf() == client_cpf:
-                self.set_client(client)
-                self.set_account(account)
-                print("Você acabou de entrar em sua conta!")
-                return True
-        return False
+        account = self.accounts.get(clear_cpf(client_cpf), None)
+        if account == None: return False
+        self.set_client(account.get_client())
+        self.set_account(account)
+        print("Você acabou de entrar em sua conta!")
+        return True
 
     def sign_out_account(self) -> bool:
         """
@@ -192,7 +202,6 @@ class Bank:
             return False
 
         return self.account.transfer(value, account_of_receipt)
-
 
     def show_account_information(self):
         """
