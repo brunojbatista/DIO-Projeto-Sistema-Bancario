@@ -1,85 +1,82 @@
-# 💰 Sistema Bancário XPTO
 
-Este projeto implementa um **sistema bancário simples** em Python com operações básicas de **depósito**, **saque**, **extrato** e **encerramento da operação**. O sistema é baseado em linha de comando e mantém um controle simples de saldo e movimentações.
+# 💰 Sistema Bancário em Python
 
----
+Este é um projeto de sistema bancário em Python, desenvolvido como desafio prático. O sistema permite a criação e autenticação de contas bancárias, com suporte para operações como **depósito**, **saque**, **transferência** e **visualização de extrato**.
 
-## 🚀 Funcionalidades
+## 🧩 Estrutura do Projeto
 
-- `Depósito`: Permite adicionar saldo à conta.
-- `Saque`: Permite retirar valores, respeitando limites diários e por operação.
-- `Extrato`: Mostra o histórico de operações e o saldo atual.
-- `Encerramento`: Finaliza o sistema com confirmação do usuário.
+- `index.py`: Arquivo principal, ponto de entrada do sistema (executar este arquivo para iniciar o sistema).
+- `Bank.py`: Contém a classe `Bank`, que gerencia múltiplas contas e autenticação.
+- `Account.py`: Implementa a estrutura e regras de uma conta bancária.
+- `CheckingAccount.py`: Herda de `Account`, especializada em conta corrente.
+- `Client.py`: Representa o cliente, contendo CPF e nome.
+- `Utils.py`: Funções auxiliares como validação de CPF, arredondamento e limpeza de terminal.
 
----
+## 🚀 Como Executar
 
-## 📦 Estrutura do Código
+1. Certifique-se de ter o Python 3.8+ instalado.
+2. Clone o repositório ou extraia os arquivos.
+3. No terminal, execute o comando:
 
-O sistema é estruturado com uma classe principal chamada `Bank`, que contém os métodos:
+```bash
+python index.py
+```
 
-- `deposit()`: Realiza depósitos após validações.
-- `withdraw()`: Realiza saques com limites e regras.
-- `print_account_statement()`: Exibe o extrato com data e hora.
-- `close_operation()`: Fecha o sistema com confirmação.
-- `add_statement()`: Registra cada operação.
-- `get_statement()`: Retorna o extrato registrado.
+4. Siga as instruções do menu para:
 
----
+- Criar uma conta
+- Logar com CPF
+- Realizar operações (depósito, saque, extrato, transferência)
+- Encerrar sessão
 
-## 📋 Como Utilizar
+## ⚠️ Validações e Regras de Negócio
 
-1. Certifique-se de ter Python 3 instalado.
-2. Execute o script:
+- **CPF:** Deve ser válido (formato `000.000.000-00`) para criar ou acessar conta.
+- **Depósito:** Não são aceitos valores negativos ou zero.
+- **Saque:** 
+  - Máximo de R$500,00 por operação.
+  - Limite de até 3 saques por sessão.
+  - Verifica saldo disponível.
+- **Transferência:** Não permite transferir para a própria conta. Verifica CPF de destino.
 
-   ```bash
-   python nome_do_arquivo.py
-   ```
+## 📦 Exemplo de Execução
 
-3. O menu será apresentado:
+```bash
+Bem vindo!
+Escolha uma opção:
 
-   ```
-   -----------------------------------------------------
-   Você está no menu do banco XPTO
-   Escolha uma das opções abaixo:
+[c] Criar Conta
+[l] Logar com CPF
+[q] Sair
 
-   [d] Depositar
-   [s] Sacar
-   [e] Extrato
-   [q] Sair
-   ```
+=> c
+Informe seu nome: João
+Informe seu CPF (formato 000.000.000-00): 123.456.789-00
+Conta criada com sucesso!
+```
 
-4. Basta digitar a opção desejada e seguir as instruções.
+## ✅ Funcionalidades Implementadas
 
----
+- [x] Cadastro de cliente com CPF
+- [x] Criação de conta corrente
+- [x] Login via CPF
+- [x] Depósito e saque com regras
+- [x] Transferência entre contas
+- [x] Extrato com timestamp
+- [x] Validações robustas
 
-## ⚠️ Possíveis Erros e Restrições
+## 📁 Organização de Código
 
-| Situação | Mensagem / Ação |
-|----------|------------------|
-| Valor digitado não numérico | "Só é aceito dígitos numéricos na operação!" |
-| Valor <= 0 | "O valor é inválido para depósito/saque" |
-| Saque maior que o saldo | "Saldo insuficiente..." |
-| Saque acima de R$ 500 | "O valor do saque excede o limite de R$ 500.00" |
-| Mais de 3 saques no dia | "O total de saque excedeu o limite de 3 saques" |
-| Opção de menu inválida | "Operação inválida, tente as opções disponíveis por favor!" |
+O projeto utiliza orientação a objetos com separação clara de responsabilidades:
 
----
-
-## 🛠️ Dependências
-
-- Python padrão (`datetime`, `time`, `random`, `os`) — já incluídas na instalação padrão do Python.
-
----
-
-## ✅ Melhorias Possíveis
-
-- Implementar autenticação de usuário.
-- Armazenar os dados em arquivo (persistência).
-- Implementar interface gráfica (GUI ou Web).
-- Controlar limite diário de transações com data real.
+- Cliente (`Client`)
+- Conta bancária (`Account`, `CheckingAccount`)
+- Gerenciador de contas e autenticação (`Bank`)
+- Utilitários (`Utils`)
 
 ---
 
-## 📄 Licença
+## 🧑‍💻 Autor
 
-Este projeto é de uso livre para fins educacionais e experimentação.
+Este projeto foi desenvolvido como parte do desafio da [DIO.me](https://www.dio.me/).  
+Sinta-se livre para usar, modificar e expandir.
