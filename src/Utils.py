@@ -1,6 +1,9 @@
 from decimal import ROUND_HALF_UP, Decimal
 import re
 
+TOTAL_DIGITS_ACCOUNT_NUMBER = 8
+TOTAL_DIGITS_AGENCY_NUMBER = 4
+
 def clear_cmd_line(length: int):
     """
     Limpa a linha atual no terminal imprimindo espaços em branco.
@@ -34,7 +37,25 @@ def format_cpf(cpf: str) -> str:
     remain_caracteres = 11 - len(str_formatted)
     if remain_caracteres > 0:
         str_formatted = ("0" * remain_caracteres) + str_formatted
-    return f"{str_formatted[0:3]}.{str_formatted[3:6]}.{str_formatted[6:9]}\-{str_formatted[9:11]}"
+    return f"{str_formatted[0:3]}.{str_formatted[3:6]}.{str_formatted[6:9]}-{str_formatted[9:11]}"
+
+def format_account_number(num: int):
+    current_number_account = str(num)
+    remain_caracteres = TOTAL_DIGITS_ACCOUNT_NUMBER - len(current_number_account)
+    account_number = ""
+    if remain_caracteres > 0:
+        account_number = "0" * remain_caracteres
+    account_number += current_number_account
+    return account_number
+
+def format_agency_number(num: int):
+    current_agency_account = str(num)
+    remain_caracteres = TOTAL_DIGITS_AGENCY_NUMBER - len(current_agency_account)
+    agency_number = ""
+    if remain_caracteres > 0:
+        agency_number = "0" * remain_caracteres
+    agency_number += current_agency_account
+    return agency_number
 
 def round_decimal(value: Decimal, decimal_places: int) -> Decimal:
     """
