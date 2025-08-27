@@ -19,10 +19,8 @@ Escolha uma das opções abaixo:
 => """
 
 from decimal import Decimal
-from src.Bank import Bank
-from src.entities.AccountNumber import AccountNumber
-from src.entities.Address import Address
-from src.entities.Client import CPF, Client, DateOfBirth
+from src import Bank
+from src.entities import AccountNumber, Address, CPF, Client, DateOfBirth
         
 bank: Bank = Bank()
 

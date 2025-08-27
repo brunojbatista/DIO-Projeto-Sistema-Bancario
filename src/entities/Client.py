@@ -3,12 +3,10 @@ from __future__ import annotations
 import re
 from typing import List, TYPE_CHECKING
 
-from src.entities.Address import Address
-from src.entities.CPF import CPF
-from src.entities.DateOfBirth import DateOfBirth
+from src.entities import Address, CPF, DateOfBirth
 
 if TYPE_CHECKING:
-    from src.entities.Account import Account
+    from src.entities import Account
 
 class Client:
     """

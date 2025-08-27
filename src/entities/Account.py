@@ -6,12 +6,11 @@ from decimal import Decimal
 import time
 from typing import List, TYPE_CHECKING
 
-from src.Utils import round_decimal, clear_cmd_line
-from src.entities.AccountNumber import AccountNumber
-from src.entities.AgencyNumber import AgencyNumber
+from src import round_decimal, clear_cmd_line
+from src.entities import AccountNumber, AgencyNumber
 
 if TYPE_CHECKING:
-    from src.entities.Client import Client
+    from src.entities import Client
 
 LIMIT_PER_WITHDRAWLS = Decimal('500.00')
 MAX_WITHDRAWLS = 3

@@ -1,8 +1,4 @@
-from src.entities.Client import Client
-from src.entities.DateOfBirth import DateOfBirth
-from src.entities.CPF import CPF
-from src.entities.Address import Address
-from src.entities.Account import Account  # Se já estiver criado
+from src.entities import Client, DateOfBirth, CPF, Address, Account
 
 if __name__ == '__main__':
     # Criando a data de nascimento
@@ -32,10 +28,12 @@ if __name__ == '__main__':
     )
     print(f"\n{client}")
 
-    # Criando uma conta (se já estiver implementada)
-    account = Account(
-        account_number=1234,
-        agency_number=1,
+    # Criando uma conta corrente (Account é abstrata, usamos CheckingAccount)
+    from src.entities import CheckingAccount, AccountNumber, AgencyNumber
+    
+    account = CheckingAccount(
+        account_number=AccountNumber(1234),
+        agency_number=AgencyNumber(1),
         client=client
     )
 

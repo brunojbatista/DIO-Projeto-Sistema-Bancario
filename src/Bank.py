@@ -1,14 +1,10 @@
 from __future__ import annotations
 from typing import Dict, List, TYPE_CHECKING
 
-from src.entities.Account import Account
-from src.entities.AccountNumber import AccountNumber
-from src.entities.AgencyNumber import AgencyNumber
-from src.entities.CheckingAccount import CheckingAccount
+from src.entities import Account, AccountNumber, AgencyNumber, CheckingAccount
 
 if TYPE_CHECKING:
-    from src.entities.Client import Client
-    from src.entities.Client import CPF
+    from src.entities import Client, CPF
 
 PROCESSING_WAITING_TIME_IN_SECONDS = 2
 AGENCY_NUMBER = 1
