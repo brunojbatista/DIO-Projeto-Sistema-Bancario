@@ -140,6 +140,13 @@ python index.py
 - **Controle de iteração**: Suporte para reset e controle manual com next()
 - **Integração com menu**: Opção 'l' no menu principal para listar todas as contas
 
+### 9. Limite Diário de Transações
+- **Limite de 10 transações por dia**: Cada conta pode realizar no máximo 10 transações por dia
+- **Contagem por data**: Sistema considera apenas transações do dia atual
+- **Verificação automática**: Todas as transações (depósito, saque, transferência) verificam o limite
+- **Mensagens informativas**: Usuário é informado sobre transações realizadas e restantes
+- **Opção no menu**: Nova opção 'l' no menu da conta para consultar informações do limite
+
 ## 📊 Exemplo de Uso
 
 ```python
@@ -187,6 +194,11 @@ accounts_iterator = bank.get_accounts_iterator()
 for account_info in accounts_iterator:
     print(f"Conta: {account_info['account_number']} - Cliente: {account_info['client_name']} - Saldo: R$ {account_info['balance']}")
 
+# Verificar limite diário de transações
+daily_count = account.get_daily_transactions_count()
+remaining = account.get_remaining_daily_transactions()
+print(f"Transações hoje: {daily_count} | Restantes: {remaining}")
+
 ## 🎯 Benefícios da Refatoração
 
 1. **Manutenibilidade**: Código mais organizado e fácil de manter
@@ -197,6 +209,7 @@ for account_info in accounts_iterator:
 6. **Rastreabilidade**: Logging completo de todas as transações com timestamps
 7. **Iteração Flexível**: Gerador para processar transações de forma eficiente e com filtros
 8. **Visão Geral do Banco**: Iterador personalizado para listar todas as contas do banco
+9. **Controle de Transações**: Limite diário de transações para controle de uso
 
 ## 🔍 Decorador de Transações
 
@@ -301,6 +314,51 @@ total_balance = sum(acc['balance'] for acc in accounts_iterator)
 print(f"Saldo total do banco: R$ {total_balance}")
 ```
 
+## 🕐 Limite Diário de Transações
+
+O sistema implementa um controle de limite diário de transações para cada conta, permitindo no máximo 10 transações por dia.
+
+### Funcionalidades do Limite Diário
+
+- **🕐 Contagem por Data**: Sistema considera apenas transações do dia atual
+- **📊 Verificação Automática**: Todas as transações verificam o limite antes da execução
+- **⚠️ Bloqueio Inteligente**: Impede transações quando o limite é atingido
+- **📋 Informações Detalhadas**: Mostra transações realizadas e restantes
+- **🎯 Integração com Menu**: Opção 'l' no menu da conta para consultar limite
+
+### Exemplos de Uso
+
+```python
+# Verificar se pode realizar transação
+if account.can_perform_transaction_today():
+    account.deposit(Decimal('100.00'))
+else:
+    print("Limite diário atingido!")
+
+# Contar transações de hoje
+daily_count = account.get_daily_transactions_count()
+print(f"Transações hoje: {daily_count}")
+
+# Verificar transações restantes
+remaining = account.get_remaining_daily_transactions()
+print(f"Restantes: {remaining}")
+
+# Tentar transação (gera erro se limite excedido)
+try:
+    account.withdraw(Decimal('50.00'))
+except ValueError as e:
+    print(f"Erro: {e}")
+```
+
+### Mensagens de Erro
+
+Quando o limite é excedido, o sistema exibe:
+```
+Limite diário de transações excedido! 
+Você já realizou 10 transações hoje. 
+Limite máximo: 10 transações por dia.
+```
+
 ---
 
 ## 👤 Autor
@@ -322,3 +380,4 @@ Projeto desenvolvido como desafio prático da [DIO](https://www.dio.me/).
 - **v3.1**: Implementação de decorador para logging de transações com timestamp
 - **v3.2**: Implementação de gerador para iteração e filtros de transações
 - **v3.3**: Implementação de iterador personalizado para contas do banco
+- **v3.4**: Implementação de limite diário de transações

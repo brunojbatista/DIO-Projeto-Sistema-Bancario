@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 LIMIT_PER_WITHDRAWLS = Decimal('500.00')
 MAX_WITHDRAWLS = 3
+MAX_DAILY_TRANSACTIONS = 10
 DEFAULT_DECIMAL_PLACES = 2
 PROCESSING_WAITING_TIME_IN_SECONDS = 2
 
@@ -110,6 +111,51 @@ class Account:
             transaction (Transaction): A transação a ser adicionada.
         """
         self.transactions.append(transaction)
+
+    def get_daily_transactions_count(self, date: datetime = None) -> int:
+        """
+        Conta o número de transações realizadas em uma data específica.
+        
+        Args:
+            date (datetime, optional): Data para verificar. Se None, usa a data atual.
+            
+        Returns:
+            int: Número de transações na data especificada.
+        """
+        if date is None:
+            date = datetime.now()
+        
+        # Normaliza a data para comparar apenas dia/mês/ano
+        target_date = date.date()
+        
+        count = 0
+        for transaction in self.transactions:
+            if hasattr(transaction, '_timestamp') and transaction._timestamp:
+                transaction_date = transaction._timestamp.date()
+                if transaction_date == target_date:
+                    count += 1
+        
+        return count
+
+    def can_perform_transaction_today(self) -> bool:
+        """
+        Verifica se a conta pode realizar uma nova transação hoje.
+        
+        Returns:
+            bool: True se pode realizar transação, False se atingiu o limite diário.
+        """
+        daily_count = self.get_daily_transactions_count()
+        return daily_count < MAX_DAILY_TRANSACTIONS
+
+    def get_remaining_daily_transactions(self) -> int:
+        """
+        Retorna o número de transações restantes para hoje.
+        
+        Returns:
+            int: Número de transações que ainda podem ser realizadas hoje.
+        """
+        daily_count = self.get_daily_transactions_count()
+        return max(0, MAX_DAILY_TRANSACTIONS - daily_count)
 
     def iterate_transactions(self, transaction_type: str = None):
         """
@@ -243,12 +289,19 @@ class Account:
             value (Decimal): Valor a ser sacado.
 
         Raises:
-            ValueError: Caso o valor seja inválido, saldo insuficiente, ultrapasse o limite de saque
-                        ou o número máximo de saques permitido.
+            ValueError: Caso o valor seja inválido, saldo insuficiente, ultrapasse o limite de saque,
+                        o número máximo de saques permitido ou o limite diário de transações.
 
         Returns:
             Decimal: Valor sacado, se bem-sucedido.
         """
+        # Verifica limite diário de transações
+        if not self.can_perform_transaction_today():
+            daily_count = self.get_daily_transactions_count()
+            raise ValueError(f"Limite diário de transações excedido! "
+                           f"Você já realizou {daily_count} transações hoje. "
+                           f"Limite máximo: {MAX_DAILY_TRANSACTIONS} transações por dia.")
+        
         from src.entities import Withdraw
         withdraw_transaction = Withdraw(self, value)
         success = withdraw_transaction.execute()
@@ -267,8 +320,15 @@ class Account:
             value (Decimal): Valor a ser depositado.
 
         Raises:
-            ValueError: Se o valor for menor ou igual a zero.
+            ValueError: Se o valor for menor ou igual a zero ou se o limite diário de transações for excedido.
         """
+        # Verifica limite diário de transações
+        if not self.can_perform_transaction_today():
+            daily_count = self.get_daily_transactions_count()
+            raise ValueError(f"Limite diário de transações excedido! "
+                           f"Você já realizou {daily_count} transações hoje. "
+                           f"Limite máximo: {MAX_DAILY_TRANSACTIONS} transações por dia.")
+        
         from src.entities import Deposit
         deposit_transaction = Deposit(self, value)
         success = deposit_transaction.execute()
@@ -290,8 +350,15 @@ class Account:
             bool: True se bem-sucedido.
 
         Raises:
-            ValueError: Em caso de valor inválido, saldo insuficiente ou contas iguais.
+            ValueError: Em caso de valor inválido, saldo insuficiente, contas iguais ou limite diário excedido.
         """
+        # Verifica limite diário de transações
+        if not self.can_perform_transaction_today():
+            daily_count = self.get_daily_transactions_count()
+            raise ValueError(f"Limite diário de transações excedido! "
+                           f"Você já realizou {daily_count} transações hoje. "
+                           f"Limite máximo: {MAX_DAILY_TRANSACTIONS} transações por dia.")
+        
         from src.entities import Transfer
         transfer_transaction = Transfer(self, account_of_receipt, value)
         success = transfer_transaction.execute()

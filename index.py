@@ -15,6 +15,7 @@ Escolha uma das opções abaixo:
 [s] Sacar
 [e] Extrato
 [t] Transferir
+[l] Limite diário
 [q] Sair
 
 => """
@@ -158,6 +159,21 @@ while True:
                     continue
             elif option_account == 'e':
                 account.show_extract()
+            elif option_account == 'l':
+                print("\n📊 INFORMAÇÕES DO LIMITE DIÁRIO")
+                print("-" * 40)
+                daily_count = account.get_daily_transactions_count()
+                remaining = account.get_remaining_daily_transactions()
+                print(f"Transações realizadas hoje: {daily_count}")
+                print(f"Transações restantes: {remaining}")
+                print(f"Limite diário: 10 transações")
+                if remaining == 0:
+                    print("⚠️  Você atingiu o limite diário de transações!")
+                elif remaining <= 2:
+                    print("⚠️  Atenção: Poucas transações restantes para hoje!")
+                else:
+                    print("✅ Você ainda pode realizar transações hoje.")
+                print("-" * 40)
             elif option_account == 'q':
                 print("Você saiu do menu da sua conta bancária!")
                 break
