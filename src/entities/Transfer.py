@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from src.entities import Transaction
+from src.decorators import transaction_logger
 
 if TYPE_CHECKING:
     from src.entities import Account
@@ -33,6 +34,7 @@ class Transfer(Transaction):
         """Retorna a conta de destino da transferência."""
         return self._destination_account
     
+    @transaction_logger
     def execute(self) -> bool:
         """
         Executa a transferência entre as contas.

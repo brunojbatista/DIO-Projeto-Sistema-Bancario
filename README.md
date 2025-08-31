@@ -12,6 +12,7 @@ DIO-Projeto-Sistema-Bancario/
 │   ├── __init__.py          # Configurações de importação do módulo src
 │   ├── Bank.py              # Gerencia clientes e suas contas bancárias
 │   ├── Utils.py             # Utilidades como arredondamento e limpeza do terminal
+│   ├── decorators.py        # Decoradores para logging de transações
 │   └── entities/            # Entidades do sistema bancário
 │       ├── __init__.py      # Configurações de importação das entidades
 │       ├── Account.py       # Classe principal para contas bancárias
@@ -118,6 +119,13 @@ python index.py
 - **Extrato mais preciso**: O saldo é calculado corretamente após cada transação
 - **Flexibilidade**: Fácil adição de novos tipos de transação no futuro
 
+### 6. Decorador de Logging de Transações
+- **Decorador `@transaction_logger`**: Aplicado a todos os métodos `execute()` das transações
+- **Registro completo**: Data/hora de início, duração, status e informações detalhadas
+- **Timestamp armazenado**: Cada transação armazena seu timestamp para uso no extrato
+- **Logging visual**: Interface clara com emojis e formatação para facilitar o acompanhamento
+- **Tratamento de erros**: Captura e exibe erros durante a execução das transações
+
 ## 📊 Exemplo de Uso
 
 ```python
@@ -142,14 +150,13 @@ account = Account(
 from decimal import Decimal
 from src.entities import Deposit, Withdraw
 
-# Depósito
+# Depósito (com logging automático via decorador)
 deposit = Deposit(account, Decimal('1000.00'))
 deposit.execute()
 
-# Saque
+# Saque (com logging automático via decorador)
 withdraw = Withdraw(account, Decimal('500.00'))
 withdraw.execute()
-```
 
 ## 🎯 Benefícios da Refatoração
 
@@ -158,6 +165,38 @@ withdraw.execute()
 3. **Testabilidade**: Cada componente pode ser testado isoladamente
 4. **Legibilidade**: Código mais claro e auto-documentado
 5. **Reutilização**: Componentes podem ser reutilizados em outros contextos
+6. **Rastreabilidade**: Logging completo de todas as transações com timestamps
+
+## 🔍 Decorador de Transações
+
+O sistema implementa um decorador `@transaction_logger` que é aplicado automaticamente a todos os métodos `execute()` das transações bancárias.
+
+### Funcionalidades do Decorador
+
+- **📅 Registro de Timestamp**: Cada transação armazena sua data/hora de início
+- **⏱️ Medição de Duração**: Calcula o tempo de execução de cada transação
+- **📊 Informações Detalhadas**: Exibe dados da conta, cliente e valores
+- **✅ Status de Execução**: Indica se a transação foi bem-sucedida ou falhou
+- **🚨 Tratamento de Erros**: Captura e exibe erros durante a execução
+
+### Exemplo de Saída do Decorador
+
+```
+============================================================
+🕐 INÍCIO DA TRANSAÇÃO: Deposit
+📅 Data/Hora: 31/08/2025 às 14:30:38
+💰 Valor: R$ 1000.00
+🏦 Conta: 00000001
+👤 Cliente: João Silva
+============================================================
+
+============================================================
+✅ TRANSAÇÃO CONCLUÍDA: Deposit
+📅 Data/Hora: 31/08/2025 às 14:30:40
+⏱️  Duração: 2.00 segundos
+🎯 Status: Sucesso
+============================================================
+```
 
 ---
 
@@ -177,3 +216,4 @@ Projeto desenvolvido como desafio prático da [DIO](https://www.dio.me/).
 - **v2.0**: Implementação do padrão Strategy com classes Transaction, Deposit e Withdraw
 - **v2.1**: Simplificação da hierarquia de classes e melhorias na arquitetura
 - **v3.0**: Sistema de transações com lista de objetos e classe Transfer dedicada
+- **v3.1**: Implementação de decorador para logging de transações com timestamp

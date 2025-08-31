@@ -137,7 +137,11 @@ class Account:
         current_balance = Decimal('0')  # Começa com saldo zero
         
         for transaction in self.transactions:
-            date_now_string = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
+            # Usa o timestamp da transação se disponível, senão usa o momento atual
+            if hasattr(transaction, '_timestamp') and transaction._timestamp:
+                date_string = transaction._timestamp.strftime("%d/%m/%Y às %H:%M:%S")
+            else:
+                date_string = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
             
             # Calcula o saldo após esta transação
             from src.entities import Deposit, Withdraw, Transfer
@@ -161,7 +165,7 @@ class Account:
             
             full_message = (f"{description} => Saldo após operação R$ "
                             f"{round_decimal(current_balance, DEFAULT_DECIMAL_PLACES)}"
-                            f" - Realizado em {date_now_string}\n")
+                            f" - Realizado em {date_string}\n")
             extract_text += full_message
         
         return extract_text

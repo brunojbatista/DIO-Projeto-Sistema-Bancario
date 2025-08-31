@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from src.entities import Transaction
+from src.decorators import transaction_logger
 
 if TYPE_CHECKING:
     from src.entities import Account
@@ -26,6 +27,7 @@ class Deposit(Transaction):
         """
         super().__init__(account, value)
     
+    @transaction_logger
     def execute(self) -> bool:
         """
         Executa o depósito na conta.
