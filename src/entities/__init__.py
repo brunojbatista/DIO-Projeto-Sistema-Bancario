@@ -5,18 +5,22 @@ from .Account import Account
 from .AccountNumber import AccountNumber
 from .Address import Address
 from .AgencyNumber import AgencyNumber
-from .CheckingAccount import CheckingAccount
 from .Client import Client
 from .CPF import CPF
 from .DateOfBirth import DateOfBirth
+from .Transaction import Transaction
+from .Deposit import Deposit
+from .Withdraw import Withdraw
 
 __all__ = [
     'Account',
     'AccountNumber', 
     'Address',
     'AgencyNumber',
-    'CheckingAccount',
     'Client',
     'CPF',
-    'DateOfBirth'
+    'DateOfBirth',
+    'Transaction',
+    'Deposit',
+    'Withdraw'
 ]

@@ -76,16 +76,20 @@ while True:
             print("Cliente já existente!")
             continue
     elif option_bank == 'c':
-        client_cpf = input("Digite o CPF: ").strip()
-        cpf = CPF(client_cpf)
-        client = bank.search_client(cpf)
-        if not client:
-            print("Não há cliente com o registro do CPF!")
-            continue
-        if bank.create_checking_account(client):
-            print("Conta criada com sucesso!")
-        else:
-            print("Ocorreu um erro na criação da conta!")
+        try:
+            client_cpf = input("Digite o CPF: ").strip()
+            cpf = CPF(client_cpf)
+            client = bank.search_client(cpf)
+            if not client:
+                print("Não há cliente com o registro do CPF!")
+                continue
+            if bank.create_account(client):
+                print("Conta criada com sucesso!")
+            else:
+                print("Ocorreu um erro na criação da conta!")
+                continue
+        except ValueError as e:
+            print(str(e))
             continue
     elif option_bank == 'a':
         cpf: CPF = None

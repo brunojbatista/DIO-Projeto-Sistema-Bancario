@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from datetime import datetime
 from decimal import Decimal
 import time
@@ -17,11 +17,11 @@ MAX_WITHDRAWLS = 3
 DEFAULT_DECIMAL_PLACES = 2
 PROCESSING_WAITING_TIME_IN_SECONDS = 2
 
-class Account(ABC):
+class Account:
     """
-    Classe abstrata que representa uma conta bancária.
+    Classe que representa uma conta bancária.
 
-    Fornece métodos para operações comuns como depósito, saque (abstrato), transferência,
+    Fornece métodos para operações comuns como depósito, saque, transferência,
     geração de extrato e manipulação de saldo.
     """
 
@@ -151,22 +151,30 @@ class Account(ABC):
         """Incrementa o total de saques realizados."""
         self.total_withdrawl += total
 
-    @abstractmethod
     def withdraw(self, value: Decimal) -> Decimal:
         """
-        Método abstrato para saque.
+        Realiza um saque usando a classe Withdraw.
 
         Args:
             value (Decimal): Valor a ser sacado.
 
+        Raises:
+            ValueError: Caso o valor seja inválido, saldo insuficiente, ultrapasse o limite de saque
+                        ou o número máximo de saques permitido.
+
         Returns:
-            Decimal: Valor efetivamente sacado.
+            Decimal: Valor sacado, se bem-sucedido.
         """
-        pass
+        from src.entities import Withdraw
+        withdraw_transaction = Withdraw(self, value)
+        success = withdraw_transaction.execute()
+        if not success:
+            raise ValueError("Falha ao realizar saque")
+        return value
 
     def deposit(self, value: Decimal):
         """
-        Realiza um depósito na conta, com registro em extrato.
+        Realiza um depósito na conta usando a classe Deposit.
 
         Args:
             value (Decimal): Valor a ser depositado.
@@ -174,16 +182,11 @@ class Account(ABC):
         Raises:
             ValueError: Se o valor for menor ou igual a zero.
         """
-        if value <= 0:
-            raise ValueError("O valor é inválido para deposito")
-        operation_info = 'Processando o depósito... Aguarde um momento!'
-        print(operation_info, end='', flush=True)
-        self.add_balance(value)
-        time.sleep(PROCESSING_WAITING_TIME_IN_SECONDS)
-        clear_cmd_line(len(operation_info))
-        print("O valor foi depositado com sucesso!")
-        self.add_extract(f"Você depositou R$ {round_decimal(value, DEFAULT_DECIMAL_PLACES)}")
-        print(f"O seu saldo atual é de: R$ {round_decimal(self.balance, DEFAULT_DECIMAL_PLACES)}")
+        from src.entities import Deposit
+        deposit_transaction = Deposit(self, value)
+        success = deposit_transaction.execute()
+        if not success:
+            raise ValueError("Falha ao realizar depósito")
 
     def transfer(self, value: Decimal, account_of_receipt: 'Account') -> bool:
         """

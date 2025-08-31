@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Dict, List, TYPE_CHECKING
 
-from src.entities import Account, AccountNumber, AgencyNumber, CheckingAccount
+from src.entities import Account, AccountNumber, AgencyNumber
 
 if TYPE_CHECKING:
     from src.entities import Client, CPF
@@ -142,7 +142,7 @@ class Bank:
 
     def create_account(self, client: Client) -> bool:
         """
-        Cria uma conta comum e a registra no banco.
+        Cria uma conta e a registra no banco.
 
         Args:
             client (Client): Cliente dono da nova conta.
@@ -167,7 +167,7 @@ class Bank:
         Returns:
             bool: True se registrada com sucesso.
         """
-        account = CheckingAccount(
+        account = Account(
             account_number=AccountNumber(Bank.current_account_number),
             agency_number=AgencyNumber(AGENCY_NUMBER),
             client=client
