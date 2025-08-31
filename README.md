@@ -147,6 +147,13 @@ python index.py
 - **Mensagens informativas**: Usuário é informado sobre transações realizadas e restantes
 - **Opção no menu**: Nova opção 'l' no menu da conta para consultar informações do limite
 
+### 10. Sistema de Log em Arquivo
+- **Log persistente**: Todas as transações são salvas em arquivo `log.txt`
+- **Formato JSON**: Cada entrada de log é um objeto JSON em uma linha
+- **Informações completas**: Data/hora, função, argumentos, valor retornado, status
+- **Análise integrada**: Ferramenta de análise integrada ao menu principal
+- **Backup contínuo**: Logs são adicionados ao final do arquivo existente
+
 ## 📊 Exemplo de Uso
 
 ```python
@@ -199,6 +206,9 @@ daily_count = account.get_daily_transactions_count()
 remaining = account.get_remaining_daily_transactions()
 print(f"Transações hoje: {daily_count} | Restantes: {remaining}")
 
+# Os logs são automaticamente salvos em log.txt
+# Para analisar os logs, use a opção [g] no menu principal
+
 ## 🎯 Benefícios da Refatoração
 
 1. **Manutenibilidade**: Código mais organizado e fácil de manter
@@ -210,6 +220,7 @@ print(f"Transações hoje: {daily_count} | Restantes: {remaining}")
 7. **Iteração Flexível**: Gerador para processar transações de forma eficiente e com filtros
 8. **Visão Geral do Banco**: Iterador personalizado para listar todas as contas do banco
 9. **Controle de Transações**: Limite diário de transações para controle de uso
+10. **Auditoria Completa**: Sistema de log em arquivo para rastreabilidade e análise
 
 ## 🔍 Decorador de Transações
 
@@ -359,6 +370,63 @@ Você já realizou 10 transações hoje.
 Limite máximo: 10 transações por dia.
 ```
 
+## 📝 Sistema de Log em Arquivo
+
+O sistema implementa um mecanismo de log persistente que salva todas as transações em um arquivo `log.txt` para auditoria e análise posterior.
+
+### Funcionalidades do Sistema de Log
+
+- **📄 Log Persistente**: Todas as transações são salvas automaticamente em `log.txt`
+- **📊 Formato Estruturado**: Cada entrada é um objeto JSON com informações completas
+- **🔄 Append Mode**: Novos logs são adicionados ao final do arquivo existente
+- **🔍 Análise Detalhada**: Ferramenta para visualizar e filtrar logs
+- **📈 Estatísticas**: Geração automática de estatísticas dos logs
+
+### Informações Registradas
+
+Cada entrada de log contém:
+- **Data e hora** da transação
+- **Nome da função** executada
+- **Tipo de transação** (Deposit, Withdraw, Transfer)
+- **Argumentos** da função
+- **Valor retornado** pela função
+- **Status** da execução (Sucesso/Erro)
+- **Duração** da transação
+- **Informações da conta** e cliente
+- **Mensagem de erro** (se aplicável)
+
+### Exemplo de Entrada de Log
+
+```json
+{
+  "timestamp": "31/08/2025 às 15:40:56",
+  "function_name": "execute",
+  "transaction_type": "Deposit",
+  "arguments": {"args": [], "kwargs": {}},
+  "transaction_value": "1000.00",
+  "account_number": "00000001",
+  "client_name": "João Silva",
+  "return_value": "True",
+  "status": "Sucesso",
+  "duration_seconds": 2.004003,
+  "end_timestamp": "31/08/2025 às 15:40:58"
+}
+```
+
+### Análise de Logs
+
+O analisador de logs está integrado ao menu principal do sistema bancário. Para acessar:
+
+1. Execute o sistema: `python index.py`
+2. Escolha a opção `[g] Analisar logs do sistema`
+
+O analisador oferece:
+- **📊 Estatísticas gerais** dos logs
+- **🔍 Filtros por tipo** de transação
+- **👤 Filtros por cliente** ou conta
+- **❌ Visualização de erros**
+- **📋 Logs recentes** com detalhes
+
 ---
 
 ## 👤 Autor
@@ -381,3 +449,4 @@ Projeto desenvolvido como desafio prático da [DIO](https://www.dio.me/).
 - **v3.2**: Implementação de gerador para iteração e filtros de transações
 - **v3.3**: Implementação de iterador personalizado para contas do banco
 - **v3.4**: Implementação de limite diário de transações
+- **v3.5**: Implementação de sistema de log em arquivo para auditoria

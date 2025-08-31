@@ -5,6 +5,7 @@ Bem vindo! Por favor escolha uma das opções:
 [c] Criar uma conta corrente
 [a] Acessar conta
 [l] Listar todas as contas
+[g] Analisar logs do sistema
 
 => """
 
@@ -23,7 +24,259 @@ Escolha uma das opções abaixo:
 from decimal import Decimal
 from src import Bank
 from src.entities import AccountNumber, Address, CPF, Client, DateOfBirth
+import json
+from collections import defaultdict
+
+def carregar_logs(arquivo='log.txt'):
+    """
+    Carrega os logs do arquivo especificado.
+    
+    Args:
+        arquivo (str): Nome do arquivo de log
         
+    Returns:
+        list: Lista de dicionários com os logs
+    """
+    logs = []
+    try:
+        with open(arquivo, 'r', encoding='utf-8') as log_file:
+            for line in log_file:
+                line = line.strip()
+                if line:
+                    try:
+                        log_entry = json.loads(line)
+                        logs.append(log_entry)
+                    except json.JSONDecodeError:
+                        print(f"⚠️  Erro ao decodificar linha: {line[:50]}...")
+    except FileNotFoundError:
+        print(f"❌ Arquivo {arquivo} não encontrado")
+        return []
+    
+    return logs
+
+def analisar_logs(logs):
+    """
+    Analisa os logs e gera estatísticas.
+    
+    Args:
+        logs (list): Lista de logs carregados
+        
+    Returns:
+        dict: Estatísticas dos logs
+    """
+    if not logs:
+        return {}
+    
+    stats = {
+        'total_transacoes': len(logs),
+        'por_tipo': defaultdict(int),
+        'por_status': defaultdict(int),
+        'por_conta': defaultdict(int),
+        'por_cliente': defaultdict(int),
+        'duracao_media': 0,
+        'transacoes_sucesso': 0,
+        'transacoes_erro': 0
+    }
+    
+    total_duracao = 0
+    
+    for log in logs:
+        # Contagem por tipo
+        stats['por_tipo'][log.get('transaction_type', 'Desconhecido')] += 1
+        
+        # Contagem por status
+        status = log.get('status', 'Desconhecido')
+        stats['por_status'][status] += 1
+        
+        if status == 'Sucesso':
+            stats['transacoes_sucesso'] += 1
+        else:
+            stats['transacoes_erro'] += 1
+        
+        # Contagem por conta
+        if 'account_number' in log:
+            stats['por_conta'][log['account_number']] += 1
+        
+        # Contagem por cliente
+        if 'client_name' in log:
+            stats['por_cliente'][log['client_name']] += 1
+        
+        # Duração
+        duracao = log.get('duration_seconds', 0)
+        total_duracao += duracao
+    
+    if logs:
+        stats['duracao_media'] = total_duracao / len(logs)
+    
+    return stats
+
+def exibir_estatisticas(stats):
+    """
+    Exibe as estatísticas dos logs de forma organizada.
+    
+    Args:
+        stats (dict): Estatísticas dos logs
+    """
+    if not stats:
+        print("❌ Nenhuma estatística disponível")
+        return
+    
+    print("\n📊 ESTATÍSTICAS DOS LOGS")
+    print("=" * 50)
+    
+    print(f"📈 Total de transações: {stats['total_transacoes']}")
+    print(f"✅ Transações com sucesso: {stats['transacoes_sucesso']}")
+    print(f"❌ Transações com erro: {stats['transacoes_erro']}")
+    print(f"⏱️  Duração média: {stats['duracao_media']:.3f} segundos")
+    
+    print("\n🏦 Transações por tipo:")
+    for tipo, quantidade in stats['por_tipo'].items():
+        print(f"   {tipo}: {quantidade}")
+    
+    print("\n👤 Transações por cliente:")
+    for cliente, quantidade in stats['por_cliente'].items():
+        print(f"   {cliente}: {quantidade}")
+    
+    print("\n🏛️  Transações por conta:")
+    for conta, quantidade in stats['por_conta'].items():
+        print(f"   {conta}: {quantidade}")
+
+def exibir_logs_recentes(logs, quantidade=5):
+    """
+    Exibe os logs mais recentes.
+    
+    Args:
+        logs (list): Lista de logs
+        quantidade (int): Número de logs a exibir
+    """
+    if not logs:
+        print("❌ Nenhum log disponível")
+        return
+    
+    print(f"\n📋 ÚLTIMAS {quantidade} TRANSAÇÕES")
+    print("=" * 50)
+    
+    logs_recentes = logs[-quantidade:]
+    
+    for i, log in enumerate(logs_recentes, 1):
+        timestamp = log.get('timestamp', 'N/A')
+        tipo = log.get('transaction_type', 'N/A')
+        status = log.get('status', 'N/A')
+        cliente = log.get('client_name', 'N/A')
+        valor = log.get('transaction_value', 'N/A')
+        
+        print(f"{i}. {timestamp} | {tipo} | {status} | {cliente} | R$ {valor}")
+
+def filtrar_logs_por_tipo(logs, tipo):
+    """
+    Filtra logs por tipo de transação.
+    
+    Args:
+        logs (list): Lista de logs
+        tipo (str): Tipo de transação para filtrar
+        
+    Returns:
+        list: Logs filtrados
+    """
+    return [log for log in logs if log.get('transaction_type') == tipo]
+
+def filtrar_logs_por_cliente(logs, cliente):
+    """
+    Filtra logs por cliente.
+    
+    Args:
+        logs (list): Lista de logs
+        cliente (str): Nome do cliente para filtrar
+        
+    Returns:
+        list: Logs filtrados
+    """
+    return [log for log in logs if log.get('client_name') == cliente]
+
+def menu_analisador_logs():
+    """
+    Menu do analisador de logs integrado ao sistema bancário.
+    """
+    print("\n🔍 ANALISADOR DE LOGS DO SISTEMA BANCÁRIO")
+    print("=" * 60)
+    
+    # Carregar logs
+    logs = carregar_logs()
+    
+    if not logs:
+        print("❌ Nenhum log encontrado. Execute algumas transações primeiro.")
+        return
+    
+    # Analisar logs
+    stats = analisar_logs(logs)
+    
+    # Exibir estatísticas
+    exibir_estatisticas(stats)
+    
+    # Exibir logs recentes
+    exibir_logs_recentes(logs, 10)
+    
+    # Menu de opções
+    while True:
+        print("\n" + "=" * 50)
+        print("🎯 OPÇÕES DE ANÁLISE:")
+        print("1. Ver logs de depósitos")
+        print("2. Ver logs de saques")
+        print("3. Ver logs de transferências")
+        print("4. Ver logs de um cliente específico")
+        print("5. Ver logs de uma conta específica")
+        print("6. Ver logs com erro")
+        print("0. Voltar ao menu principal")
+        
+        opcao = input("\nEscolha uma opção: ").strip()
+        
+        if opcao == '0':
+            print("👋 Voltando ao menu principal...")
+            break
+        elif opcao == '1':
+            logs_depositos = filtrar_logs_por_tipo(logs, 'Deposit')
+            print(f"\n💰 LOGS DE DEPÓSITOS ({len(logs_depositos)} transações):")
+            for log in logs_depositos:
+                print(f"   {log['timestamp']} | {log['client_name']} | R$ {log['transaction_value']} | {log['status']}")
+        elif opcao == '2':
+            logs_saques = filtrar_logs_por_tipo(logs, 'Withdraw')
+            print(f"\n💸 LOGS DE SAQUES ({len(logs_saques)} transações):")
+            for log in logs_saques:
+                print(f"   {log['timestamp']} | {log['client_name']} | R$ {log['transaction_value']} | {log['status']}")
+        elif opcao == '3':
+            logs_transferencias = filtrar_logs_por_tipo(logs, 'Transfer')
+            print(f"\n🔄 LOGS DE TRANSFERÊNCIAS ({len(logs_transferencias)} transações):")
+            for log in logs_transferencias:
+                print(f"   {log['timestamp']} | {log['client_name']} → {log.get('destination_client', 'N/A')} | R$ {log['transaction_value']} | {log['status']}")
+        elif opcao == '4':
+            cliente = input("Digite o nome do cliente: ").strip()
+            logs_cliente = filtrar_logs_por_cliente(logs, cliente)
+            if logs_cliente:
+                print(f"\n👤 LOGS DO CLIENTE {cliente} ({len(logs_cliente)} transações):")
+                for log in logs_cliente:
+                    print(f"   {log['timestamp']} | {log['transaction_type']} | R$ {log['transaction_value']} | {log['status']}")
+            else:
+                print(f"❌ Nenhum log encontrado para o cliente {cliente}")
+        elif opcao == '5':
+            conta = input("Digite o número da conta: ").strip()
+            logs_conta = [log for log in logs if log.get('account_number') == conta]
+            if logs_conta:
+                print(f"\n🏦 LOGS DA CONTA {conta} ({len(logs_conta)} transações):")
+                for log in logs_conta:
+                    print(f"   {log['timestamp']} | {log['transaction_type']} | R$ {log['transaction_value']} | {log['status']}")
+            else:
+                print(f"❌ Nenhum log encontrado para a conta {conta}")
+        elif opcao == '6':
+            logs_erro = [log for log in logs if log.get('status') != 'Sucesso']
+            if logs_erro:
+                print(f"\n❌ LOGS COM ERRO ({len(logs_erro)} transações):")
+                for log in logs_erro:
+                    print(f"   {log['timestamp']} | {log['transaction_type']} | {log['client_name']} | {log.get('error_message', 'Erro desconhecido')}")
+            else:
+                print("✅ Nenhum erro encontrado nos logs")
+        else:
+            print("❌ Opção inválida!")
+
 bank: Bank = Bank()
 
 while True:
@@ -194,5 +447,7 @@ while True:
             
             print("-" * 80)
             print("✅ Listagem concluída!")
+    elif option_bank == 'g':
+        menu_analisador_logs()
     else:
         print("Operação inválida, tente as opções disponíveis por favor!")
