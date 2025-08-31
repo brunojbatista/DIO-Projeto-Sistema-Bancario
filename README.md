@@ -133,6 +133,13 @@ python index.py
 - **Flexibilidade**: Pode ser usado em loops, list comprehensions e expressões
 - **Validação de tipos**: Verifica se o tipo de transação especificado é válido
 
+### 8. Iterador Personalizado de Contas
+- **Classe `AccountIterator`**: Iterador personalizado para todas as contas do banco
+- **Informações completas**: Retorna número da conta, agência, saldo, cliente e total de transações
+- **Formatação personalizada**: Método para exibir informações de forma organizada
+- **Controle de iteração**: Suporte para reset e controle manual com next()
+- **Integração com menu**: Opção 'l' no menu principal para listar todas as contas
+
 ## 📊 Exemplo de Uso
 
 ```python
@@ -175,6 +182,11 @@ print("\n💰 Apenas depósitos:")
 for transaction in account.iterate_transactions('deposit'):
     print(f"- Depósito: R$ {transaction.value}")
 
+# Usar o iterador de contas do banco
+accounts_iterator = bank.get_accounts_iterator()
+for account_info in accounts_iterator:
+    print(f"Conta: {account_info['account_number']} - Cliente: {account_info['client_name']} - Saldo: R$ {account_info['balance']}")
+
 ## 🎯 Benefícios da Refatoração
 
 1. **Manutenibilidade**: Código mais organizado e fácil de manter
@@ -184,6 +196,7 @@ for transaction in account.iterate_transactions('deposit'):
 5. **Reutilização**: Componentes podem ser reutilizados em outros contextos
 6. **Rastreabilidade**: Logging completo de todas as transações com timestamps
 7. **Iteração Flexível**: Gerador para processar transações de forma eficiente e com filtros
+8. **Visão Geral do Banco**: Iterador personalizado para listar todas as contas do banco
 
 ## 🔍 Decorador de Transações
 
@@ -247,6 +260,47 @@ total_withdraws = sum(t.value for t in account.iterate_transactions('withdraw'))
 first_deposit = next(account.iterate_transactions('deposit'))
 ```
 
+## 🏦 Iterador de Contas do Banco
+
+O sistema implementa um iterador personalizado `AccountIterator` que permite iterar sobre todas as contas do banco, retornando informações básicas de cada conta.
+
+### Funcionalidades do Iterador
+
+- **🔄 Iteração Personalizada**: Implementa os protocolos `__iter__` e `__next__`
+- **📊 Informações Completas**: Retorna número da conta, agência, saldo, cliente e total de transações
+- **🎨 Formatação Personalizada**: Método para exibir informações de forma organizada
+- **🔄 Controle de Estado**: Suporte para reset do iterador
+- **📋 Integração com Menu**: Opção 'l' no menu principal para listar todas as contas
+
+### Exemplos de Uso
+
+```python
+# Obter iterador de todas as contas
+accounts_iterator = bank.get_accounts_iterator()
+
+# Iterar sobre todas as contas
+for account_info in accounts_iterator:
+    print(f"Conta: {account_info['account_number']}")
+    print(f"Cliente: {account_info['client_name']}")
+    print(f"Saldo: R$ {account_info['balance']}")
+
+# Usar formatação personalizada
+accounts_iterator.reset()
+for account_info in accounts_iterator:
+    formatted_info = accounts_iterator.get_account_info_formatted(account_info)
+    print(formatted_info)
+
+# Usar next() manualmente
+accounts_iterator.reset()
+first_account = next(accounts_iterator)
+print(f"Primeira conta: {first_account['client_name']}")
+
+# Calcular saldo total do banco
+accounts_iterator.reset()
+total_balance = sum(acc['balance'] for acc in accounts_iterator)
+print(f"Saldo total do banco: R$ {total_balance}")
+```
+
 ---
 
 ## 👤 Autor
@@ -267,3 +321,4 @@ Projeto desenvolvido como desafio prático da [DIO](https://www.dio.me/).
 - **v3.0**: Sistema de transações com lista de objetos e classe Transfer dedicada
 - **v3.1**: Implementação de decorador para logging de transações com timestamp
 - **v3.2**: Implementação de gerador para iteração e filtros de transações
+- **v3.3**: Implementação de iterador personalizado para contas do banco

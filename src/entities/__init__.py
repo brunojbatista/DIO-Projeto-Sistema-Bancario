@@ -12,6 +12,7 @@ from .Transaction import Transaction
 from .Deposit import Deposit
 from .Withdraw import Withdraw
 from .Transfer import Transfer
+from .AccountIterator import AccountIterator
 
 __all__ = [
     'Account',
@@ -24,5 +25,6 @@ __all__ = [
     'Transaction',
     'Deposit',
     'Withdraw',
-    'Transfer'
+    'Transfer',
+    'AccountIterator'
 ]

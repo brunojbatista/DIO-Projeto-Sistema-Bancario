@@ -209,3 +209,13 @@ class Bank:
                 account.client.cpf == cpf:
                 return account
         return None
+
+    def get_accounts_iterator(self):
+        """
+        Cria um iterador personalizado para todas as contas do banco.
+        
+        Returns:
+            AccountIterator: Iterador que permite iterar sobre todas as contas.
+        """
+        from src.entities import AccountIterator
+        return AccountIterator(self.accounts)

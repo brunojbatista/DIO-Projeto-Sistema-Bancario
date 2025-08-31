@@ -4,6 +4,7 @@ Bem vindo! Por favor escolha uma das opções:
 [r] Cadastrar novo cliente
 [c] Criar uma conta corrente
 [a] Acessar conta
+[l] Listar todas as contas
 
 => """
 
@@ -160,7 +161,24 @@ while True:
             elif option_account == 't':
                 print("Transferir para outra conta")
             elif option_account == 'q':
-                print("Você saiu do menu da sua conta bancária!")
-                break;
+                        print("Você saiu do menu da sua conta bancária!")
+        break;
+    elif option_bank == 'l':
+        print("\n📊 LISTANDO TODAS AS CONTAS DO BANCO")
+        print("=" * 80)
+        
+        if not bank.accounts:
+            print("Nenhuma conta cadastrada no banco.")
+        else:
+            accounts_iterator = bank.get_accounts_iterator()
+            print(f"Total de contas: {len(accounts_iterator)}")
+            print("-" * 80)
+            
+            for i, account_info in enumerate(accounts_iterator, 1):
+                formatted_info = accounts_iterator.get_account_info_formatted(account_info)
+                print(f"{i:2d}. {formatted_info}")
+            
+            print("-" * 80)
+            print("✅ Listagem concluída!")
     else:
         print("Operação inválida, tente as opções disponíveis por favor!")
