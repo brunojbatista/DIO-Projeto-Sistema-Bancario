@@ -153,6 +153,12 @@ withdraw.execute()
 
 ## 👤 Autor
 
+**Bruno Batista**
+
+📧 Email: brunojbatista@hotmail.com  
+📱 Telefone: +55 (81) 9 9929-0698 — WhatsApp / Telegram  
+🔗 [LinkedIn](https://www.linkedin.com/in/bruno-batista/)
+
 Projeto desenvolvido como desafio prático da [DIO](https://www.dio.me/).
 
 ### Histórico de Versões
