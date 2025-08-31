@@ -10,7 +10,7 @@ from src import round_decimal, clear_cmd_line
 from src.entities import AccountNumber, AgencyNumber
 
 if TYPE_CHECKING:
-    from src.entities import Client
+    from src.entities import Client, Transaction, Deposit, Withdraw, Transfer
 
 LIMIT_PER_WITHDRAWLS = Decimal('500.00')
 MAX_WITHDRAWLS = 3
@@ -38,14 +38,14 @@ class Account:
         self._agency_number: AgencyNumber = None
         self._client: Client = None
         self._balance: Decimal = None
-        self._extract: List[str] = None
+        self._transactions: List[Transaction] = None
         self._total_withdrawl: int = None
 
         self.account_number = account_number
         self.agency_number = agency_number
         self.client = client
         self.balance = Decimal('0')
-        self.extract = []
+        self.transactions = []
         self.total_withdrawl = 0
 
     @property
@@ -85,13 +85,13 @@ class Account:
         self._balance = balance
 
     @property
-    def extract(self) -> List[str]:
-        """Retorna o extrato da conta."""
-        return self._extract
+    def transactions(self) -> List[Transaction]:
+        """Retorna a lista de transações da conta."""
+        return self._transactions
 
-    @extract.setter
-    def extract(self, extract: List[str]):
-        self._extract = extract
+    @transactions.setter
+    def transactions(self, transactions: List[Transaction]):
+        self._transactions = transactions
 
     @property
     def total_withdrawl(self) -> int:
@@ -102,18 +102,26 @@ class Account:
     def total_withdrawl(self, total_withdrawl: int):
         self._total_withdrawl = total_withdrawl
 
+    def add_transaction(self, transaction: Transaction):
+        """
+        Adiciona uma transação à lista de transações da conta.
+
+        Args:
+            transaction (Transaction): A transação a ser adicionada.
+        """
+        self.transactions.append(transaction)
+
     def add_extract(self, message: str):
         """
         Adiciona uma entrada ao extrato com a data e saldo atual.
+        Método mantido para compatibilidade, mas agora usa transações.
 
         Args:
             message (str): Mensagem descritiva da operação.
         """
-        date_now_string = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
-        full_message = (f"{message} => Saldo após operação R$ "
-                        f"{round_decimal(self.balance, DEFAULT_DECIMAL_PLACES)}"
-                        f" - Realizado em {date_now_string}\n")
-        self.extract.append(full_message)
+        # Este método agora é usado apenas para compatibilidade
+        # As transações são adicionadas diretamente via add_transaction
+        pass
 
     def generate_extract_information_text(self) -> str:
         """
@@ -122,9 +130,41 @@ class Account:
         Returns:
             str: Texto formatado do extrato bancário.
         """
-        if not self.extract:
+        if not self.transactions:
             return "Extrato Bancário:\n\n-- Nenhuma movimentação --"
-        return "Extrato Bancário:\n\n" + "".join(self.extract)
+        
+        extract_text = "Extrato Bancário:\n\n"
+        current_balance = Decimal('0')  # Começa com saldo zero
+        
+        for transaction in self.transactions:
+            date_now_string = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
+            
+            # Calcula o saldo após esta transação
+            from src.entities import Deposit, Withdraw, Transfer
+            if isinstance(transaction, Deposit):
+                current_balance += transaction.value
+            elif isinstance(transaction, Withdraw):
+                current_balance -= transaction.value
+            elif isinstance(transaction, Transfer):
+                if transaction.account == self:  # Conta de origem
+                    current_balance -= transaction.value
+                else:  # Conta de destino
+                    current_balance += transaction.value
+            
+            # Gera descrição específica para cada tipo de transação
+            if hasattr(transaction, 'get_description_for_account'):
+                # Para transferências
+                description = transaction.get_description_for_account(self)
+            else:
+                # Para depósitos e saques
+                description = str(transaction)
+            
+            full_message = (f"{description} => Saldo após operação R$ "
+                            f"{round_decimal(current_balance, DEFAULT_DECIMAL_PLACES)}"
+                            f" - Realizado em {date_now_string}\n")
+            extract_text += full_message
+        
+        return extract_text
 
     def generate_account_information_text(self) -> str:
         """
@@ -170,6 +210,9 @@ class Account:
         success = withdraw_transaction.execute()
         if not success:
             raise ValueError("Falha ao realizar saque")
+        
+        # Adiciona a transação à lista
+        self.add_transaction(withdraw_transaction)
         return value
 
     def deposit(self, value: Decimal):
@@ -187,10 +230,13 @@ class Account:
         success = deposit_transaction.execute()
         if not success:
             raise ValueError("Falha ao realizar depósito")
+        
+        # Adiciona a transação à lista
+        self.add_transaction(deposit_transaction)
 
     def transfer(self, value: Decimal, account_of_receipt: 'Account') -> bool:
         """
-        Realiza uma transferência entre contas.
+        Realiza uma transferência entre contas usando a classe Transfer.
 
         Args:
             value (Decimal): Valor a ser transferido.
@@ -202,22 +248,14 @@ class Account:
         Raises:
             ValueError: Em caso de valor inválido, saldo insuficiente ou contas iguais.
         """
-        if value <= 0:
-            raise ValueError("O valor é inválido para transferir")
-        if value > self.balance:
-            raise ValueError("O valor é maior que o saldo de sua conta")
-        if self == account_of_receipt:
-            raise ValueError("Não é possível transferir para a mesma conta")
-
-        operation_info = 'Processando a transferência... Aguarde um momento!'
-        print(operation_info, end='', flush=True)
-        self.sub_balance(value)
-        account_of_receipt.add_balance(value)
-        time.sleep(PROCESSING_WAITING_TIME_IN_SECONDS)
-        clear_cmd_line(len(operation_info))
-        self.add_extract(f"Você transferiu um valor de R$ {round_decimal(value, DEFAULT_DECIMAL_PLACES)} para o cliente {account_of_receipt.client.name} (CPF: {account_of_receipt.client.cpf} / Número da Conta: {account_of_receipt.account_number} / Agência: {account_of_receipt.agency_number})")
-        account_of_receipt.add_extract(f"Você recebeu um valor de R$ {round_decimal(value, DEFAULT_DECIMAL_PLACES)} do cliente {self.client.name} (CPF: {self.client.cpf} / Número da Conta: {self.account_number} / Agência: {self.agency_number})")
-        print(f"O seu saldo atual é de: R$ {round_decimal(self.balance, DEFAULT_DECIMAL_PLACES)}")
+        from src.entities import Transfer
+        transfer_transaction = Transfer(self, account_of_receipt, value)
+        success = transfer_transaction.execute()
+        if not success:
+            raise ValueError("Falha ao realizar transferência")
+        
+        # Adiciona a transação à lista da conta de origem
+        self.add_transaction(transfer_transaction)
         return True
 
     def show_extract(self):

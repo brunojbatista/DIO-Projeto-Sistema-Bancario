@@ -67,8 +67,7 @@ class Withdraw(Transaction):
             clear_cmd_line(len(operation_info))
             print("Saque realizado com sucesso!")
             
-            # Registra a transação no extrato
-            self.account.add_extract(f"Você sacou R$ {round_decimal(self.value, DEFAULT_DECIMAL_PLACES)}")
+            # A transação será registrada pela classe Account
             print(f"O seu saldo atual é de: R$ {round_decimal(self.account.balance, DEFAULT_DECIMAL_PLACES)}")
             
             return True

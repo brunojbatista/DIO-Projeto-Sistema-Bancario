@@ -11,6 +11,7 @@ from .DateOfBirth import DateOfBirth
 from .Transaction import Transaction
 from .Deposit import Deposit
 from .Withdraw import Withdraw
+from .Transfer import Transfer
 
 __all__ = [
     'Account',
@@ -22,5 +23,6 @@ __all__ = [
     'DateOfBirth',
     'Transaction',
     'Deposit',
-    'Withdraw'
+    'Withdraw',
+    'Transfer'
 ]

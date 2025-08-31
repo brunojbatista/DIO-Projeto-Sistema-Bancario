@@ -52,10 +52,9 @@ class Deposit(Transaction):
             clear_cmd_line(len(operation_info))
             print("O valor foi depositado com sucesso!")
             
-            # Registra a transação no extrato
+            # A transação será registrada pela classe Account
             from src import round_decimal
             DEFAULT_DECIMAL_PLACES = 2
-            self.account.add_extract(f"Você depositou R$ {round_decimal(self.value, DEFAULT_DECIMAL_PLACES)}")
             print(f"O seu saldo atual é de: R$ {round_decimal(self.account.balance, DEFAULT_DECIMAL_PLACES)}")
             
             return True

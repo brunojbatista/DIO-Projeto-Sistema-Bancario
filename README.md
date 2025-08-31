@@ -18,6 +18,7 @@ DIO-Projeto-Sistema-Bancario/
 │       ├── Transaction.py   # Classe abstrata para transações bancárias
 │       ├── Deposit.py       # Implementação de transação de depósito
 │       ├── Withdraw.py      # Implementação de transação de saque
+│       ├── Transfer.py      # Implementação de transação de transferência
 │       ├── Client.py        # Define o cliente com dados pessoais
 │       ├── AccountNumber.py # Validação e geração de números de conta
 │       ├── AgencyNumber.py  # Validação e geração de números de agência
@@ -37,12 +38,14 @@ O sistema foi refatorado para implementar o **padrão Strategy** para transaçõ
 - **`Transaction`**: Classe abstrata que define a interface para transações bancárias
 - **`Deposit`**: Implementação específica para transações de depósito
 - **`Withdraw`**: Implementação específica para transações de saque
+- **`Transfer`**: Implementação específica para transações de transferência entre contas
 
 ### Padrão Strategy Implementado
 
-As operações de depósito e saque agora são delegadas para classes especializadas:
+As operações de depósito, saque e transferência agora são delegadas para classes especializadas:
 - `Account.deposit()` → `Deposit.execute()`
 - `Account.withdraw()` → `Withdraw.execute()`
+- `Account.transfer()` → `Transfer.execute()`
 
 Isso permite maior flexibilidade e facilita a adição de novos tipos de transações no futuro.
 
@@ -108,6 +111,13 @@ python index.py
 - Mensagens de confirmação claras
 - Formatação consistente de valores monetários
 
+### 5. Sistema de Transações com Lista de Objetos
+- **Substituição do extrato por lista de transações**: O extrato agora é gerado dinamicamente a partir de uma lista de objetos `Transaction`
+- **Classe Transfer dedicada**: Criada uma classe específica para transferências entre contas
+- **Melhor rastreabilidade**: Cada transação é um objeto com informações completas
+- **Extrato mais preciso**: O saldo é calculado corretamente após cada transação
+- **Flexibilidade**: Fácil adição de novos tipos de transação no futuro
+
 ## 📊 Exemplo de Uso
 
 ```python
@@ -166,3 +176,4 @@ Projeto desenvolvido como desafio prático da [DIO](https://www.dio.me/).
 - **v1.0**: Sistema bancário básico com classes Account e CheckingAccount
 - **v2.0**: Implementação do padrão Strategy com classes Transaction, Deposit e Withdraw
 - **v2.1**: Simplificação da hierarquia de classes e melhorias na arquitetura
+- **v3.0**: Sistema de transações com lista de objetos e classe Transfer dedicada
