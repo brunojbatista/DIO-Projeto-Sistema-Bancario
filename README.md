@@ -126,6 +126,13 @@ python index.py
 - **Logging visual**: Interface clara com emojis e formatação para facilitar o acompanhamento
 - **Tratamento de erros**: Captura e exibe erros durante a execução das transações
 
+### 7. Gerador de Transações
+- **Método `iterate_transactions()`**: Gerador que permite iterar sobre as transações da conta
+- **Filtros por tipo**: Suporte para filtrar por 'deposit', 'withdraw', 'transfer' ou todos
+- **Iteração eficiente**: Processa transações uma por vez, economizando memória
+- **Flexibilidade**: Pode ser usado em loops, list comprehensions e expressões
+- **Validação de tipos**: Verifica se o tipo de transação especificado é válido
+
 ## 📊 Exemplo de Uso
 
 ```python
@@ -158,6 +165,16 @@ deposit.execute()
 withdraw = Withdraw(account, Decimal('500.00'))
 withdraw.execute()
 
+# Usar o gerador para iterar sobre transações
+print("\n📊 Iterando sobre transações:")
+for transaction in account.iterate_transactions():
+    print(f"- {type(transaction).__name__}: R$ {transaction.value}")
+
+# Filtrar apenas depósitos
+print("\n💰 Apenas depósitos:")
+for transaction in account.iterate_transactions('deposit'):
+    print(f"- Depósito: R$ {transaction.value}")
+
 ## 🎯 Benefícios da Refatoração
 
 1. **Manutenibilidade**: Código mais organizado e fácil de manter
@@ -166,6 +183,7 @@ withdraw.execute()
 4. **Legibilidade**: Código mais claro e auto-documentado
 5. **Reutilização**: Componentes podem ser reutilizados em outros contextos
 6. **Rastreabilidade**: Logging completo de todas as transações com timestamps
+7. **Iteração Flexível**: Gerador para processar transações de forma eficiente e com filtros
 
 ## 🔍 Decorador de Transações
 
@@ -198,6 +216,37 @@ O sistema implementa um decorador `@transaction_logger` que é aplicado automati
 ============================================================
 ```
 
+## 🔄 Gerador de Transações
+
+O sistema implementa um gerador `iterate_transactions()` que permite iterar sobre as transações de uma conta com filtros opcionais por tipo.
+
+### Funcionalidades do Gerador
+
+- **🔄 Iteração Eficiente**: Processa transações uma por vez, economizando memória
+- **🔍 Filtros por Tipo**: Suporte para 'deposit', 'withdraw', 'transfer' ou todos
+- **📊 Flexibilidade**: Pode ser usado em loops, list comprehensions e expressões
+- **✅ Validação**: Verifica se o tipo de transação especificado é válido
+- **🎯 Compatibilidade**: Funciona com todas as funcionalidades de iteradores Python
+
+### Exemplos de Uso
+
+```python
+# Iterar sobre todas as transações
+for transaction in account.iterate_transactions():
+    print(f"{type(transaction).__name__}: R$ {transaction.value}")
+
+# Filtrar apenas depósitos
+for transaction in account.iterate_transactions('deposit'):
+    print(f"Depósito: R$ {transaction.value}")
+
+# Usar em list comprehension
+deposit_values = [t.value for t in account.iterate_transactions('deposit')]
+total_withdraws = sum(t.value for t in account.iterate_transactions('withdraw'))
+
+# Usar next() para pegar a primeira transação
+first_deposit = next(account.iterate_transactions('deposit'))
+```
+
 ---
 
 ## 👤 Autor
@@ -217,3 +266,4 @@ Projeto desenvolvido como desafio prático da [DIO](https://www.dio.me/).
 - **v2.1**: Simplificação da hierarquia de classes e melhorias na arquitetura
 - **v3.0**: Sistema de transações com lista de objetos e classe Transfer dedicada
 - **v3.1**: Implementação de decorador para logging de transações com timestamp
+- **v3.2**: Implementação de gerador para iteração e filtros de transações

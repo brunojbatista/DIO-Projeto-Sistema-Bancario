@@ -111,6 +111,46 @@ class Account:
         """
         self.transactions.append(transaction)
 
+    def iterate_transactions(self, transaction_type: str = None):
+        """
+        Gerador que itera sobre as transações da conta com filtro opcional por tipo.
+        
+        Args:
+            transaction_type (str, optional): Tipo de transação para filtrar.
+                Valores aceitos: 'deposit', 'withdraw', 'transfer', None (todos)
+                
+        Yields:
+            Transaction: Transação da conta que atende ao filtro.
+        """
+        from src.entities import Deposit, Withdraw, Transfer
+        
+        # Mapeamento de tipos para classes
+        type_mapping = {
+            'deposit': Deposit,
+            'withdraw': Withdraw,
+            'transfer': Transfer
+        }
+        
+        # Se não foi especificado tipo, retorna todas as transações
+        if transaction_type is None:
+            for transaction in self.transactions:
+                yield transaction
+            return
+        
+        # Converte para lowercase para facilitar comparação
+        transaction_type = transaction_type.lower()
+        
+        # Verifica se o tipo é válido
+        if transaction_type not in type_mapping:
+            valid_types = list(type_mapping.keys()) + ['None']
+            raise ValueError(f"Tipo de transação inválido. Tipos válidos: {valid_types}")
+        
+        # Filtra transações pelo tipo especificado
+        target_class = type_mapping[transaction_type]
+        for transaction in self.transactions:
+            if isinstance(transaction, target_class):
+                yield transaction
+
     def add_extract(self, message: str):
         """
         Adiciona uma entrada ao extrato com a data e saldo atual.
