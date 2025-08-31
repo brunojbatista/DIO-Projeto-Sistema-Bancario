@@ -158,11 +158,9 @@ while True:
                     continue
             elif option_account == 'e':
                 account.show_extract()
-            elif option_account == 't':
-                print("Transferir para outra conta")
             elif option_account == 'q':
-                        print("Você saiu do menu da sua conta bancária!")
-        break;
+                print("Você saiu do menu da sua conta bancária!")
+                break
     elif option_bank == 'l':
         print("\n📊 LISTANDO TODAS AS CONTAS DO BANCO")
         print("=" * 80)
